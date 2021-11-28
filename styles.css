@@ -1,0 +1,286 @@
+:root {
+    --backgroundcolor: #ffffff;
+    --akzentfarbe: #a5a500;
+    --sitecolor: #ddd;
+    --error: #9b3333d7;
+    --negativ: #a57777;
+}
+
+body {
+    background-color: var(--sitecolor);
+    margin: 0px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+p {
+    padding-bottom: 5px;
+}
+
+p.smallinfo {
+    font-size: x-small;
+}
+
+a {
+    text-decoration: none;
+    color: var(--akzentfarbe);
+}
+
+body>header {
+    display: block;
+    position: fixed;
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    background-color: var(--backgroundcolor);
+    border-bottom: 2px solid var(--akzentfarbe);
+}
+
+body>header a {
+    color: black;
+}
+
+body>header ul {
+    display: inline-block;
+    list-style: none;
+    padding: 0px;
+    margin: 0px 0px 0px 20px;
+
+}
+
+body>header ul li {
+    display: inline-block;
+    text-decoration: none;
+    margin-right: 10px;
+    padding: 10px;
+    font-size: large;
+    border-radius: 3px;
+    background-color: lightgrey;
+    transition: 350ms ease all;
+
+}
+
+body>header ul li:hover {
+    background-color: var(--akzentfarbe);
+}
+
+.negativ li:hover {
+    background-color: lightsalmon;
+}
+
+body>footer {
+    position: fixed;
+    bottom: 0px;
+    padding: 10px;
+    width: 100%;
+    background-color: var(--backgroundcolor);
+    border-top: 2px solid var(--akzentfarbe);
+}
+
+h1 {
+    font-size: large;
+}
+
+input {
+    border-color: var(--akzentfarbe);
+    border-radius: 4px;
+    padding: 5px;
+}
+
+input[type="email"] {
+    width: calc(100% - 14px);
+    height: 25px;
+}
+
+input[type="text"] {
+    width: calc(100% - 14px);
+    height: 25px;
+}
+
+input[type="number"] {
+    width: calc(100% - 14px);
+    height: 25px;
+}
+
+input[type="password"] {
+    width: calc(100% - 14px);
+    height: 25px;
+}
+
+input[type="submit"] {
+    height: 35px;
+    width: 100%;
+}
+
+input[type="reset"] {
+    height: 35px;
+    width: 100%;
+}
+
+select {
+    border-color: var(--akzentfarbe);
+    border-radius: 4px;
+    padding: 5px;
+    height: 33px;
+    width: 100%;
+}
+
+.doubleframe {
+    margin: 5px;
+    width: calc(100% - 10px) !important;
+}
+
+input[type="email"].doubleframe {
+    width: calc(100% - 24px) !important;
+    height: 25px;
+}
+
+input[type="text"].doubleframe {
+    width: calc(100% - 24px) !important;
+    height: 25px;
+}
+
+input[type="password"].doubleframe {
+    width: calc(100% - 24px) !important;
+    height: 25px;
+}
+
+input[type="submit"].doubleframe {
+    height: 35px;
+    width: 100%;
+}
+
+
+.halfsize {
+    width: calc(50% - 3px) !important;
+}
+
+
+.flex-container {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+
+.flex-item {
+    display: flexbox;
+    flex-basis: 300px;
+    flex-grow: 1;
+    margin: 15px;
+    padding: 30px;
+    border: 2px solid var(--akzentfarbe);
+    border-radius: 15px;
+    background-color: var(--backgroundcolor);
+}
+
+.miniflex-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+
+.miniflex-item {
+    flex-basis: 300px;
+    flex-grow: 1;
+    margin: 3px;
+    padding: 3px;
+    border: 2px solid var(--akzentfarbe);
+    border-radius: 15px;
+    background-color: var(--backgroundcolor);
+}
+
+.flex-item table.showtable {
+    flex: none;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px 2px;
+}
+
+.flex-item table.showtable th {
+    padding: 5px;
+}
+
+.flex-item table.showtable td {
+    padding: 5px;
+}
+
+.flex-item table.showtable tr:nth-child(even) td {
+    background-color: var(--sitecolor);
+}
+
+.flex-item table.showtable tr:nth-child(odd) td {}
+
+table.formattable_noborder_nospacing {
+    width: 100%;
+    border-spacing: 0px 0px;
+}
+
+table.formattable_noborder_nospacing td {}
+
+.manage table {}
+
+.m_inquiry {}
+
+.overlay_bg {
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    position: fixed;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.overlay {
+    display: block;
+    position: fixed;
+    top: 100px;
+    width: 35%;
+    padding: 30px;
+    margin-left: calc(calc(100% / 2) - calc(35% / 2));
+    border-radius: 10px;
+}
+
+.overlay.form {
+    background-color: #ffffff;
+}
+
+a .error {
+    color: black;
+}
+
+.message {
+    border-radius: 5px;
+    text-align: center;
+    padding: 1px;
+    margin: 15px;
+}
+
+.error {
+    background-color: var(--error);
+}
+
+.onbottom {
+    align-items: bottom;
+    position: relative;
+    bottom: 0px;
+}
+
+.positiv {
+    background-color: var(--akzentfarbe);
+}
+
+.negativ {
+    background-color: var(--negativ);
+}
+
+.login {}
+
+.extend-rent {}
+
+.inquiry {}
