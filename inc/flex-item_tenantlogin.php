@@ -2,7 +2,7 @@
     <h1>Verlängerung deines Gerätes</h1>
     <p>Hier kannst du dich einfach einloggen mit deiner Mailadresse und einem deiner geliehenen Geräte. Gebe einfach deine eMail Adresse und die AssetID von deinem Gerät ein und drücke auf Assets anzeigen.</p>
     <form method="post">
-        <input type="hidden" name="function" value="extendrent" />
+        <input type="hidden" name="function" value="rentlogin" />
         <table class="onbottom formattable_noborder_nospacing">
             <tr>
                 <th>eMail</th>

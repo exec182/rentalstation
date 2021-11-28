@@ -26,6 +26,13 @@
                         </ul>
                     </nav>
                     <?php } ?>
+                    <?php if (isset($_SESSION['idtenant'])) { ?>
+                    <nav>
+                        <ul>
+                            <a href="?logout"><li class="negativ_hover">Logout</li></a>
+                        </ul>
+                    </nav>
+                    <?php } ?>
                 </td>
             </tr>
         </table>
@@ -43,8 +50,13 @@
         switch ($_SESSION['page']) {
             case "start":
                 include('inc/flex-item_inquiry.php');
-                //include('inc/flex-item_tenantlogin.php');
-                include('inc/flex-item_login.php');
+                if (!isset($_SESSION['idtenant']))
+                { 
+                    //include('inc/flex-item_tenantlogin.php');
+                    include('inc/flex-item_login.php');
+                } else {
+                    include('inc/flex-item_rents.php');
+                }
                 //include('inc/flex-item_availableassets.php');
                 break;
             case "manage_start":

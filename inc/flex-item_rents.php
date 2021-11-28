@@ -1,6 +1,8 @@
 <?php
     if (!isset($inc_var_rents_onlyoverdue)) $inc_var_rents_onlyoverdue = false;
-    $list = get_rents($inc_var_rents_onlyoverdue);
+    $idtenant = null;
+    if (isset($_SESSION['idtenant'])) $idtenant = $_SESSION['idtenant'];
+    $list = get_rents($inc_var_rents_onlyoverdue, $idtenant);
     if (count($list) > 0) {
 ?>
 <div class="m_rental manage flex-item">
@@ -29,7 +31,7 @@
                     <input type="hidden" name="idtenant" value="<?php echo $value['idtenant']; ?>">
                     <input type="hidden" name="function" value="rentset">
                     <input class="halfsize" type="submit" name="opt" value="Verlängern">
-                    <input class="positiv halfsize" type="submit" name="opt" value="Zurück">
+                    <?php if (!isset($_SESSION['idtenant'])) { ?><input class="positiv halfsize" type="submit" name="opt" value="Zurück"><?php } ?>
                 </form>
             </td>
         </tr>

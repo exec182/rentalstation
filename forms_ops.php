@@ -64,7 +64,18 @@ if (isset($_POST['function'])) {
                     $usererrortext = "Asset konnte nicht erstellt werden";
             }
             break;
-        
+
+        case "rentlogin":
+            if (isset($_POST['email']) && isset($_POST['assetid'])) {
+                $tenantid = find_tenant($_POST['email'], $_POST['assetid']);
+                if ($tenantid != false) 
+                    $_SESSION['idtenant'] = $tenantid;
+                else 
+                    $usererrortext = "Leider konnte die Kombination aus Mail und Asset nicht verifiziert werden";
+                //print_r($tenantid);
+            }
+            break;
+    
         case "editasset":
             if (isset($_POST['id']) && isset($_POST['devicetype']) && isset($_POST['name'])) {
                 set_asset($_POST['id'], $_POST['name'], $_POST['devicetype']);
@@ -76,6 +87,3 @@ if (isset($_POST['function'])) {
             break;
     }
 }
-
-
-?>

@@ -99,30 +99,30 @@ function recreate_password($user, $mail)
 function forget_password($user, $mail)
 {
     $newpassword = recreate_password($user, $mail);
-    
+
     if ($newpassword != false) {
         $empfaenger = $mail;
         $betreff = 'Der Betreff';
         $header = 'From: webmaster@localhost' . "\r\n" .
             'Reply-To: webmaster@localhost' . "\r\n" .
-            'X-Mailer: PHP/' . phpversion() . "\r\n" . 
+            'X-Mailer: PHP/' . phpversion() . "\r\n" .
             'Mime-Version: 1.0' . "\r\n" .
             'Content-Type: text/plain; charset=utf-8' . "\r\n" .
             'Content-Transfer-Encoding: quoted-printable';
 
 
-        $nachricht = "Hallo ".$user.",\r\n";
+        $nachricht = "Hallo " . $user . ",\r\n";
         $nachricht .= "\r\n";
         $nachricht .= "Dein Passwort wurde neu generiert.\r\n";
         $nachricht .= "\r\n";
-        $nachricht .= "Dein neues Kennwort lautet: ".$newpassword."\r\n";
+        $nachricht .= "Dein neues Kennwort lautet: " . $newpassword . "\r\n";
         $nachricht .= "\r\n";
         $nachricht .= "Viele Gruesze\r\n";
         $nachricht .= "Christoph Ziegler\r\n";
 
         if (mail($empfaenger, $betreff, $nachricht, $header)) {
             return true;
-        } else die("Passwort konnte nicht versand werden. Es lautet: ".$newpassword);
+        } else die("Passwort konnte nicht versand werden. Es lautet: " . $newpassword);
     } else {
         return false;
     }
@@ -164,7 +164,7 @@ function get_assets($id = null)
         a.idassettype as idassettype
     FROM asset as a 
         join assettype as at on (a.idassettype = at.idassettype)";
-    if ($id != null) $sql .= " WHERE a.idasset = ".$id;
+    if ($id != null) $sql .= " WHERE a.idasset = " . $id;
     return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -174,13 +174,14 @@ function set_asset($id, $name, $idassettype)
     $sql = "UPDATE `verleih`.`asset` SET `Name` = ?, `idassettype` = ? WHERE `asset`.`idasset` = ?;";
     if ($stmt = $db->prepare($sql)) {
         $stmt->bind_param('sii', $name, $idassettype, $id);
-        $stmt->execute();    
+        $stmt->execute();
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
 }
 
-function insert_asset($idassettype, $name) {
+function insert_asset($idassettype, $name)
+{
     global $db;
     $sql2 = "INSERT INTO `verleih`.`asset` (`idasset`, `Name`, `idassettype`) VALUES (NULL, ?, ?);";
     if ($stmt2 = $db->prepare($sql2) && $idassettype != 0) {
@@ -234,13 +235,13 @@ function get_rents($overdue = false, $tenantid = null)
     return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
-function set_rent_renewal($id, $idtenant, $override = false) {
+function set_rent_renewal($id, $idtenant, $override = false)
+{
     global $db;
     $sql = "SELECT renewals, renewals_max FROM `rentlist` WHERE `idrent` = ? AND `idtenant` = ?";
     $rent_renewals = 0;
     $rent_renewals_max = 0;
-    if ($stmt = $db->prepare($sql))
-    {
+    if ($stmt = $db->prepare($sql)) {
         $stmt->bind_param('ii', $id, $idtenant);
         $stmt->bind_result($rent_renewals, $rent_renewals_max);
         $stmt->execute();
@@ -254,11 +255,11 @@ function set_rent_renewal($id, $idtenant, $override = false) {
                 $stmt2->bind_param('ii', $newrents, $id);
                 $stmt2->execute();
             } else {
-                die("MYSQL Error: ".$db->errno . " " . $db->error);
+                die("MYSQL Error: " . $db->errno . " " . $db->error);
             }
-            return "JA ".$rent_renewals." ".$rent_renewals_max;
+            return "JA " . $rent_renewals . " " . $rent_renewals_max;
         } else {
-            return "NEIN ".$rent_renewals." ".$rent_renewals_max;
+            return "NEIN " . $rent_renewals . " " . $rent_renewals_max;
         }
         //set_rent_end($id);
         /*
@@ -270,7 +271,7 @@ function set_rent_renewal($id, $idtenant, $override = false) {
             die("MYSQL Error: ".$db->errno . " " . $db->error);
         } */
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
 }
 
@@ -306,7 +307,7 @@ function create_rent_inquiry($idtenant, $idasset)
         else
             return false;
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
 }
 
@@ -317,11 +318,11 @@ function set_rent_start($id)
     if ($stmt2 = $db->prepare($sql2)) {
         $stmt2->bind_param('i', $id);
         $stmt2->execute();
-        $_GET['rentstart'] = ">".$stmt2->affected_rows;
+        $_GET['rentstart'] = ">" . $stmt2->affected_rows;
         return ($stmt2->affected_rows == 1);
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
-    } 
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
+    }
 }
 
 function set_rent_end($id)
@@ -357,7 +358,7 @@ function create_tenant($mail)
             return false;
         }
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
 }
 
@@ -377,23 +378,31 @@ function get_random_asset($idassettype)
             return false;
         }
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
 }
 
-function find_tenant($mail) {
+function find_tenant($mail, $rentid = null)
+{
     global $db;
     $idtenant = 0;
-    $sql_checktenant = "select idtenant from tenant where Mail = ?";
-    $stmt_checktenant = $db->prepare($sql_checktenant);
-    $stmt_checktenant->bind_param('s', $mail);
-    $stmt_checktenant->bind_result($idtenant);
-    $stmt_checktenant->execute();
-    if ($stmt_checktenant->fetch()) {
-        return $idtenant;
-    } else {
-        return false;
-    }
+    $sql_checktenant = "select idtenant from tenant where Mail = ? limit 1";
+    if ($rentid != null) $sql_checktenant = "SELECT idtenant FROM `rentlist` WHERE `Mail` = ? AND `id` = ? limit 1";
+    if ($stmt_checktenant = $db->prepare($sql_checktenant)) {
+        if ($rentid == null)
+            $stmt_checktenant->bind_param('s', $mail);
+        else
+            $stmt_checktenant->bind_param('ss', $mail, $rentid);
+        $stmt_checktenant->bind_result($idtenant);
+        $stmt_checktenant->execute();
+        $_GET['findtenant_id'] = "wird ausgeführt".$idtenant;
+        if ($stmt_checktenant->fetch()) {
+            $_GET['findtenant_id'] = $idtenant;
+            return $idtenant;
+        } else {
+            return false;
+        }
+    } else die("MYSQL Error: " . $db->errno . " " . $db->error);
 }
 
 function set_inquiry($mail, $idassettype)
@@ -407,8 +416,7 @@ function set_inquiry($mail, $idassettype)
     $idtenant = find_tenant($mail);
     if (!$idtenant) $idtenant = create_tenant($mail);
 
-    if (get_rentcount($idtenant, $idassettype)["rest"] > 0)
-    {
+    if (get_rentcount($idtenant, $idassettype)["rest"] > 0) {
         $idasset = get_random_asset($idassettype);
         $_GET['userid'] = $idtenant;
         $_GET['randAsset'] = $idasset;
@@ -444,7 +452,8 @@ function delete_asset($idasset)
 {
 }
 
-function get_rentcount($idtenant, $idassettype = null) {
+function get_rentcount($idtenant, $idassettype = null)
+{
     global $db;
     $sql = "SELECT 
         MAX(ss.rentcount) AS rentcount,
@@ -472,11 +481,11 @@ function get_rentcount($idtenant, $idassettype = null) {
     if ($idassettype != null) $sql .= " having at.idassettype = ?";
     if ($stmt = $db->prepare($sql)) {
         if ($idassettype != null) {
-            $stmt->bind_param('ii', $idtenant, $idassettype); 
-        } else { 
-            $stmt->bind_param('i', $idtenant); 
+            $stmt->bind_param('ii', $idtenant, $idassettype);
+        } else {
+            $stmt->bind_param('i', $idtenant);
         }
-        $stmt->bind_result($rentcount,$restrents,$mail,$name, $idassettypereturn);
+        $stmt->bind_result($rentcount, $restrents, $mail, $name, $idassettypereturn);
         $stmt->execute();
         if ($idassettype != null) {
             $stmt->store_result();
@@ -488,9 +497,9 @@ function get_rentcount($idtenant, $idassettype = null) {
                 $output["mail"] = $mail;
                 return $output;
             }
-        } else 
+        } else
             return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     } else {
-        die("MYSQL Error: ".$db->errno . " " . $db->error);
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
 }
