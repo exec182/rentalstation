@@ -49,13 +49,13 @@
         }
         switch ($_SESSION['page']) {
             case "start":
-                include('inc/flex-item_inquiry.php');
                 if (!isset($_SESSION['idtenant']))
                 { 
-                    //include('inc/flex-item_tenantlogin.php');
+                    include('inc/flex-item_inquiry.php');
+                    include('inc/flex-item_tenantlogin.php');
                     include('inc/flex-item_login.php');
                 } else {
-                    include('inc/flex-item_rents.php');
+                    include('inc/flex-item_tenantassets.php');
                 }
                 //include('inc/flex-item_availableassets.php');
                 break;

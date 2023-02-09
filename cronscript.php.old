@@ -1,0 +1,77 @@
+<?php 
+include('functions.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+require 'class/phpmailer/Exception.php';
+require 'class/phpmailer/PHPMailer.php';
+require 'class/phpmailer/SMTP.php';
+
+
+require_once('class/phpmailer/PHPMailer.php');
+require_once('class/phpmailer/SMTP.php');
+$header = 'From: rental@ssc-services.de' . "\r\n" .
+'Reply-To: rental@ssc-services.de' . "\r\n" .
+'X-Mailer: PHP/' . phpversion();
+
+$overduelist = get_rents(true);
+$admin_mailtext = "Hallo, \r\n\nes sind folgende Leihgaben überfällig\r\n";
+
+
+if (count($overduelist) > 0) {
+    print_r($overduelist);
+    echo "<br><h1>Mails an Leiher</h1><br>";
+    foreach ($overduelist as $key => $value) {
+        echo "Mail an: ".$value["Mail"]."<br>";
+        echo "Überfälliges Asset entdeckt<br>";
+        echo "Asset: ".$value["Assetname"]." (".$value["prefix"].$value["idasset"].")<br>";
+        echo "<br>";
+        $admin_mailtext .= $value["Assetname"]." (".$value["prefix"].$value["idasset"].") von ".$value["Mail"]." seit ".$value["rentlimit"]."\r\n";
+
+    }
+
+
+    echo "<br><h1>Mails an Personal</h1><br>";
+
+    echo nl2br(htmlspecialchars_decode($admin_mailtext));
+    foreach (get_users() as $value) {
+
+$mail             = new PHPMailer(true);
+try {
+	$mail->IsSMTP(); // telling the class to use SMTP
+	$mail->Host       = "mail.ssc-services.de"; // SMTP server
+	$mail->Port       = 25;                    // set the SMTP port for the GMAIL server
+	$mail->SMTPAuth   = false;                  // enable SMTP authentication
+	//$mail->Username   = "yourname@yourdomain"; // SMTP account username
+	//$mail->Password   = "yourpassword";        // SMTP account password
+
+	$mail->SMTPDebug  = 2;                     // enables SMTP debug information (for testing)
+                                       // 1 = errors and messages
+                                       // 2 = messages only
+
+	$mail->SetFrom('rental@ssc-services.de', 'noreply - Rental Service');
+    $mail->addAddress('c.ziegler@ssc-services.de', 'Joe User');
+	$mail->Subject    = "PHPMailer Test Subject via smtp, basic with authentication";
+
+	$mail->Body       = $admin_mailtext;
+	$mail->AltBody    = $admin_mailtext; //"To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
+
+	$mail->send();
+    echo 'Message has been sent';
+} catch (Exception $e) {
+    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+}
+
+
+
+	//mail('<c.ziegler@ssc-services.de>', '[Rental] Statusmessage', $admin_mailtext, $header);
+        
+    }
+} else {
+    echo "keine Mails notwendig!";
+}
+
+
+

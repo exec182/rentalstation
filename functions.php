@@ -8,6 +8,20 @@ if (isset($_GET['logout'])) {
 }
 
 include('config.php');
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+require 'class/phpmailer/Exception.php';
+require 'class/phpmailer/PHPMailer.php';
+require 'class/phpmailer/SMTP.php';
+
+
+require_once('class/phpmailer/PHPMailer.php');
+require_once('class/phpmailer/SMTP.php');
+$header = 'From: rental@ssc-services.de' . "\r\n" .
+'Reply-To: rental@ssc-services.de' . "\r\n" .
+'X-Mailer: PHP/' . phpversion();
 
 $db = new mysqli($db_host, $db_user, $db_password, $db_scheme, $db_port);
 if ($db->connect_errno) {
@@ -28,6 +42,39 @@ function randomPassword($len)
         $pass .= $alphabet[$n];
     }
     return $pass;
+}
+
+function send_membermail($Subject, $text, $htmltext = null)
+{
+    global $debug_mail_off;
+    if ($htmltext == null) {
+        $htmltext = $text;
+    }
+    foreach (get_users() as $value) {
+        $mail = new PHPMailer(true);
+        try {
+            $mail->IsSMTP(); // telling the class to use SMTP
+            $mail->Host = "mail.ssc-services.de"; // SMTP server
+            $mail->Port = 25; // set the SMTP port for the GMAIL server
+            $mail->SMTPAuth = false; // enable SMTP authentication
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
+            $mail->SetFrom('rental@ssc-services.de', 'noreply - Rental Service');
+            $mail->addAddress($value["mail"]);
+            $mail->Subject = "[Rental] ".$Subject;
+            $mail->Body = $text;
+            $mail->AltBody = $htmltext; //"To view the message, please use an HTML compatible email viewer!"; // optional, comment out and test
+                        if ($debug_mail_off) {
+                            echo "Mail hät gesendet wollen";
+                            print_r($mail);
+                        } else {
+                            $mail->send();
+                        }
+//            echo 'Message has been sent';
+        } catch (Exception $e) {
+            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        }
+    }
 }
 
 function create_credentials($user, $password, $mail)
@@ -156,15 +203,17 @@ function get_assettypes_short($available = true)
 function get_assets($id = null)
 {
     global $db;
-    $sql = "SELECT 
+    $sql = "SELECT
         concat(at.prefix, a.idasset) as ID,
         at.Name as Type,
         a.Name as Name,
         a.idasset as dbid,
         a.idassettype as idassettype
-    FROM asset as a 
+    FROM asset as a
         join assettype as at on (a.idassettype = at.idassettype)";
     if ($id != null) $sql .= " WHERE a.idasset = " . $id;
+    //$_POST['assetlist'] = $db->query($sql)->fetch_all(MYSQLI_ASSOC);
+    //return $_POST['assetlist'];
     return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -184,11 +233,13 @@ function insert_asset($idassettype, $name)
 {
     global $db;
     $sql2 = "INSERT INTO `verleih`.`asset` (`idasset`, `Name`, `idassettype`) VALUES (NULL, ?, ?);";
-    if ($stmt2 = $db->prepare($sql2) && $idassettype != 0) {
+    if ($stmt2 = $db->prepare($sql2)) {
         $stmt2->bind_param('si', $name, $idassettype);
         $stmt2->execute();
         return ($stmt2->affected_rows == 1);
-    } else return false;
+    } else {
+        die("MYSQL Error: " . $db->errno . " " . $db->error);
+	}
 }
 
 function get_assettypes()
@@ -203,13 +254,13 @@ function get_assettypes()
 function get_inquiry()
 {
     global $db;
-    $sql = "SELECT * 
+    $sql = "SELECT *
     FROM `rent` as r
         join asset as a on (r.idasset = a.idasset)
         join assettype as at on (a.idassettype = at.idassettype)
         join tenant as t on (t.idtenant = r.idtenant)
-    WHERE r.`inquirydate` IS NOT NULL 
-        AND r.`start` IS NULL 
+    WHERE r.`inquirydate` IS NOT NULL
+        AND r.`start` IS NULL
         AND r.`end` IS NULL";
     return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
@@ -232,6 +283,13 @@ function get_rents($overdue = false, $tenantid = null)
         $sql .= " AND idtenant = " . $tenantid;
     }
     $sql .= " Order by rentlimit ASC";
+    return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
+}
+
+function get_rent($id = null)
+{
+    global $db;
+    $sql = "SELECT * FROM `rent` as r join tenant as t on (r.idtenant = t.idtenant) WHERE r.idrent = ".$id;
     return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -287,11 +345,17 @@ function get_available_asset()
 function get_available_assetcount()
 {
     global $db;
-    $sql = "SELECT 
+    $sql = "SELECT
         *,
         count(idasset) as Anzahl
     FROM `availableassets`
     Group by idassettype";
+    return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
+}
+
+function get_tenant($id) {
+    global $db;
+    $sql = "SELECT * FROM `tenant` WHERE `idtenant` = ".$id.";";
     return $db->query($sql)->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -302,10 +366,15 @@ function create_rent_inquiry($idtenant, $idasset)
     if ($stmt = $db->prepare($sql)) {
         $stmt->bind_param('ss', $idasset, $idtenant);
         $stmt->execute();
-        if ($stmt->affected_rows == 1)
+        if ($stmt->affected_rows == 1) {
+            $Subject = "Neue Anfrage";
+                        $asset = get_assets($idasset);
+                        $tenant = get_tenant($idtenant);
+            $mailtxt = $asset[0]['Name']."(ID: ". $asset[0]['ID'].") möchte von ".$tenant[0]['Mail']." ausgeliehen werden.";
+            send_membermail($Subject,$mailtxt);
             return true;
-        else
-            return false;
+        } else 
+			return false;
     } else {
         die("MYSQL Error: " . $db->errno . " " . $db->error);
     }
@@ -437,7 +506,7 @@ function set_inquiry($mail, $idassettype)
         return false;
     }
     // Device ermitteln und prüfen ob immer noch verfügbar und AssetID merken
-    // Rent Inquiry erzeugen 
+    // Rent Inquiry erzeugen
 }
 
 function create_asset($name, $idassettype)
@@ -455,21 +524,21 @@ function delete_asset($idasset)
 function get_rentcount($idtenant, $idassettype = null)
 {
     global $db;
-    $sql = "SELECT 
+    $sql = "SELECT
         MAX(ss.rentcount) AS rentcount,
         ss.renewals_max - MAX(ss.rentcount) AS openrents,
         group_concat(ss.Mail) AS mail,
         ss.Name,
         ss.idassettype
     FROM (
-        SELECT 
+        SELECT
             IF (t.idtenant IS NULL, 0, sum(r.renewals)) AS rentcount,
             t.Mail,
             t.idtenant,
             at.Name,
             at.renewals_max,
             at.idassettype
-        FROM 
+        FROM
             `assettype` AS at
             LEFT JOIN asset AS a ON (a.idassettype = at.idassettype)
             LEFT JOIN rent AS r ON (r.idasset = a.idasset)
